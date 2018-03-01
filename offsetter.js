@@ -1,9 +1,3 @@
-// Render libraries that apps need
-//importScripts('app_dependencies/clipper.js');
-
-// App.executor needs to define 2 objects:
-//  - parameters: Array of parameters with a type, display and value
-//  - executor: Function which consumes parameters and `done` callback
 // Define a properties array that returns array of objects representing
 // the accepted properties for your application
 var properties = [
@@ -14,7 +8,7 @@ var properties = [
   // {type: 'boolean', id: "Group?", value: false}
 ];
 
-  // flip a point vertically to the SVG coordinate system where +Y is down
+// flip a point vertically to the SVG coordinate system where +Y is down
 var flipPointY = function(point) {
   return [point[0], -point[1]];
 };
@@ -35,7 +29,7 @@ var offsetPointArrays = function(pointArrays, dx, dy) {
       return offsetPoint(point, dx, dy);
     });
   });
-}; 
+};
 
 var scale = 100000;
 var lightenThreshold = 8;
@@ -57,15 +51,15 @@ var formatClipperPoint = function(point) {
 
 var clipperToPath = function(pointArrays, shouldGroup) {
   var path = "";
-  
+
   if (shouldGroup) {
     path = '<path d="';
   }
-  
+
   for (var j=0; j < pointArrays.length; j++) {
     var points = pointArrays[j];
     var iteration = '';
-    
+
     if (!shouldGroup) {
       iteration = '<path d="';
     }
@@ -79,18 +73,18 @@ var clipperToPath = function(pointArrays, shouldGroup) {
     for (var i=1; i < points.length; i++) {
       iteration += "L" + formatClipperPoint(points[i]);
     }
-    
+
     if (!shouldGroup) {
       iteration += 'Z" stroke="#666" fill="transparent" stroke-width="0.05"></path>';
     }
-    
+
     path += iteration;
   }
-  
+
   if (shouldGroup) {
     path += '" stroke="#666" fill="transparent" stroke-width="0.05"></path>';
   }
-  
+
   return path;
 };
 
@@ -130,10 +124,10 @@ function offset(polygons, step, maxIterations, keepOriginal, joinType, isFill) {
   clipperEndType = isFill ? ClipperLib.EndType.etClosedPolygon : ClipperLib.EndType.etOpenRound;
   lastIterationPolygons = polygons;
   offsetPolygons = offsetPolygons.concat(polygons);
-  
+
   lastIterationPolygons = simplify(lastIterationPolygons);
 
-  
+
   for (iteration = i = 1, ref = maxIterations; 1 <= ref ? i <= ref : i >= ref; iteration = 1 <= ref ? ++i : --i) {
     iterationPolygons = new ClipperLib.Paths();
     offsetter.Clear();
@@ -150,13 +144,13 @@ function offset(polygons, step, maxIterations, keepOriginal, joinType, isFill) {
     offsetPolygons = offsetPolygons.concat(iterationPolygons);
     lastIterationPolygons = iterationPolygons;
   }
-  
+
   if (!keepOriginal){
     offsetPolygons.shift();
   }
-  
+
   return offsetPolygons;
-}
+};
 
 
 // Define an executor function that generates a valid SVG document string,
@@ -165,18 +159,18 @@ function offset(polygons, step, maxIterations, keepOriginal, joinType, isFill) {
 var executor = function(args, success, failure) {
   var params = args[0];
   var input = args[1].pointArrays;
-  
+
   var shapeProperties = args[1];
   var shapeWidth = shapeProperties.right - shapeProperties.left;
   var shapeHeight = shapeProperties.top - shapeProperties.bottom;
   var pointArrays = flipPointArraysY(offsetPointArrays(shapeProperties.pointArrays, -shapeProperties.left, -shapeProperties.top));
   var resultPointArrays = [];
-  
+
   var clipperInput = inputToClipper(pointArrays);
   var offsetDistance = params['Distance'] * (params['Inwards?'] ? -1 : 1);
   var clipperOutput = offset(clipperInput, offsetDistance, params['Iterations'], params['Keep original?']);
   var path = clipperToPath(clipperOutput, params['Group?']);
-  
+
   var padding = 0.25;
   var expansion = params['Inwards?'] ?  padding : (offsetDistance * params['Iterations'] + padding);
   var width = shapeWidth + 2 * expansion;
