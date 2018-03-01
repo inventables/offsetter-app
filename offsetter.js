@@ -152,7 +152,7 @@ function offset(polygons, step, maxIterations, keepOriginal, joinType, isFill) {
   }
   
   if (!keepOriginal){
-    offsetPolygons.shift();
+    offsetPolygons.splice(0, polygons.length);
   }
   
   return offsetPolygons;
