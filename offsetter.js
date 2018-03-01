@@ -1,5 +1,5 @@
 // Render libraries that apps need
-// importScripts('app_dependencies/clipper.js');
+//importScripts('app_dependencies/clipper.js');
 
 // App.executor needs to define 2 objects:
 //  - parameters: Array of parameters with a type, display and value
@@ -8,7 +8,7 @@
 // the accepted properties for your application
 var properties = [
   {type: 'range', id: "Distance", value: 0.25, min: 0, max: 1, step: 0.0001},
-  {type: 'range', id: "Iterations", value: 1, min: 0, max: 10, step: 1},
+  {type: 'range', id: "Iterations", value: 1, min: 1, max: 10, step: 1},
   {type: 'boolean', id: "Inwards?", value: false},
   {type: 'boolean', id: "Keep original?", value: true},
   // {type: 'boolean', id: "Group?", value: false}
@@ -46,7 +46,7 @@ var inputToClipper = function(pointArrays) {
       return {
         X: point[0] * scale,
         Y: point[1] * scale
-      }
+      };
     });
   });
 };
@@ -60,7 +60,7 @@ var clipperToPath = function(pointArrays, shouldGroup) {
   
   if (shouldGroup) {
     path = '<path d="';
-  };
+  }
   
   for (var j=0; j < pointArrays.length; j++) {
     var points = pointArrays[j];
@@ -68,7 +68,7 @@ var clipperToPath = function(pointArrays, shouldGroup) {
     
     if (!shouldGroup) {
       iteration = '<path d="';
-    };
+    }
 
     if (j%2 === 0) {
       points.reverse();
@@ -92,7 +92,7 @@ var clipperToPath = function(pointArrays, shouldGroup) {
   }
   
   return path;
-}
+};
 
 function simplify(polygons) {
   return ClipperLib.Clipper.SimplifyPolygons(polygons, ClipperLib.PolyFillType.pftNonZero);
@@ -150,8 +150,13 @@ function offset(polygons, step, maxIterations, keepOriginal, joinType, isFill) {
     offsetPolygons = offsetPolygons.concat(iterationPolygons);
     lastIterationPolygons = iterationPolygons;
   }
+  
+  if (!keepOriginal){
+    offsetPolygons.shift();
+  }
+  
   return offsetPolygons;
-};
+}
 
 
 // Define an executor function that generates a valid SVG document string,
@@ -172,7 +177,7 @@ var executor = function(args, success, failure) {
   var clipperOutput = offset(clipperInput, offsetDistance, params['Iterations'], params['Keep original?']);
   var path = clipperToPath(clipperOutput, params['Group?']);
   
-  var padding = 0.25
+  var padding = 0.25;
   var expansion = params['Inwards?'] ?  padding : (offsetDistance * params['Iterations'] + padding);
   var width = shapeWidth + 2 * expansion;
   var height = shapeHeight + 2 * expansion;
@@ -187,4 +192,3 @@ var executor = function(args, success, failure) {
 
   success(svg);
 };
-
