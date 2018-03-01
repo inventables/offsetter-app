@@ -1,20 +1,14 @@
-// Render libraries that apps need
-//importScripts('app_dependencies/clipper.js');
-
-// App.executor needs to define 2 objects:
-//  - parameters: Array of parameters with a type, display and value
-//  - executor: Function which consumes parameters and `done` callback
 // Define a properties array that returns array of objects representing
 // the accepted properties for your application
 var properties = [
   {type: 'range', id: "Distance", value: 0.25, min: 0, max: 1, step: 0.0001},
-  {type: 'range', id: "Iterations", value: 1, min: 1, max: 10, step: 1},
+  {type: 'range', id: "Iterations", value: 1, min: 0, max: 10, step: 1},
   {type: 'boolean', id: "Inwards?", value: false},
   {type: 'boolean', id: "Keep original?", value: true},
   // {type: 'boolean', id: "Group?", value: false}
 ];
 
-  // flip a point vertically to the SVG coordinate system where +Y is down
+// flip a point vertically to the SVG coordinate system where +Y is down
 var flipPointY = function(point) {
   return [point[0], -point[1]];
 };
